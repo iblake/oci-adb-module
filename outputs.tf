@@ -29,3 +29,11 @@ output "autonomous_database_service_console_url" {
   description = "La URL de la consola de servicio de la Autonomous Database."
   value       = oci_database_autonomous_database.adb.service_console_url
 }
+
+output "autonomous_database_high" {
+  value = oci_database_autonomous_database.adb.connection_strings[0].all_connection_strings.high
+}
+
+output "autonomous_database_low" {
+  value = oci_database_autonomous_database.adb.connection_strings[0].all_connection_strings.low
+}

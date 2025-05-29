@@ -1,22 +1,9 @@
-# main.tf
-
-# Define el proveedor OCI
-terraform {
-  required_providers {
-    oci = {
-      source  = "hashicorp/oci"
-      version = "~> 5.0" # Asegúrate de que coincida con la versión en tu módulo
-    }
-  }
-  required_version = ">= 1.0.0"
-}
-
 # Llama a tu módulo de Autonomous Database
 module "my_autonomous_database" {
   # Si tu módulo está en GitHub, usa la URL con la ref (por ejemplo, la rama 'main')
-  source = "github.com/iblake/oci-adb-module?ref=main"
+  #source = "github.com/iblake/oci-adb-module?ref=main"
   # Si tu módulo está en una ruta local (para pruebas antes de subirlo), usa la ruta relativa
-  #source = "../oci-adb-module" # Ajusta la ruta si es necesario
+  source = "../../../oci-adb-module" # Ajusta la ruta si es necesario
 
   # Variables obligatorias (los valores se cargarán desde terraform.tfvars)
   compartment_id            = var.compartment_id
@@ -37,14 +24,12 @@ module "my_autonomous_database" {
   # nsg_ids                 = var.nsg_ids
   # private_endpoint_label  = "my-private-adb"
 
+  defined_tags = var.defined_tags
+
   # Tags de ejemplo
   freeform_tags = {
     "Environment" = "Development"
     "CreatedBy"   = "Terraform"
   }
-  defined_tags = {
-    "Oracle-Tags" = {
-      "CreatedBy" = "your_user_id" # Reemplaza con tu ID de usuario de OCI
-    }
-  }
 }
+

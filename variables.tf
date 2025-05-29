@@ -116,7 +116,7 @@ variable "freeform_tags" {
 }
 
 variable "defined_tags" {
-  description = "Tags definidos (Defined tags) para aplicar al recurso."
+  description = "Defined tags in map of maps format"
   type        = map(map(string))
   default     = {}
 }

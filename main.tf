@@ -1,5 +1,13 @@
 # main.tf
 
+locals {
+  defined_tags_flattened = merge([
+    for namespace, tags in var.defined_tags : {
+      for key, value in tags : "${namespace}.${key}" => value
+    }
+  ]...)
+}
+
 # Data source para obtener la información de la versión del secreto de la contraseña de admin
 data "oci_vault_secret_version" "admin_password_version_info" {
   secret_id           = var.admin_password_secret_id
@@ -33,5 +41,6 @@ resource "oci_database_autonomous_database" "adb" {
 
   # Tags
   freeform_tags = var.freeform_tags
-  defined_tags  = var.defined_tags
+  defined_tags = local.defined_tags_flattened
+
 }
