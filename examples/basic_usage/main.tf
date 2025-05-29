@@ -1,35 +1,50 @@
-variable "compartment_id" {
-  description = "Compartment OCID where the ADB will be deployed"
-  type        = string
+# main.tf
+
+# Define el proveedor OCI
+terraform {
+  required_providers {
+    oci = {
+      source  = "hashicorp/oci"
+      version = "~> 5.0" # Asegúrate de que coincida con la versión en tu módulo
+    }
+  }
+  required_version = ">= 1.0.0"
 }
 
-variable "admin_password_secret_id" {
-  description = "OCID of the Vault secret storing the admin password"
-  type        = string
-}
+# Llama a tu módulo de Autonomous Database
+module "my_autonomous_database" {
+  # Si tu módulo está en GitHub, usa la URL con la ref (por ejemplo, la rama 'main')
+  source = "github.com/iblake/oci-adb-module?ref=main"
+  # Si tu módulo está en una ruta local (para pruebas antes de subirlo), usa la ruta relativa
+  #source = "../oci-adb-module" # Ajusta la ruta si es necesario
 
-variable "admin_password_secret_version" {
-  description = "Version number of the Vault secret"
-  type        = number
-  default     = 1
-}
+  # Variables obligatorias (los valores se cargarán desde terraform.tfvars)
+  compartment_id            = var.compartment_id
+  db_name                   = var.db_name
+  admin_password_secret_id  = var.admin_password_secret_id
+  admin_password_secret_version = var.admin_password_secret_version # O null si quieres que el módulo use la última
 
-module "autonomous_db" {
-  source = "../../" # Ruta al módulo raíz
+  # Variables opcionales con valores específicos o por defecto
+  cpu_core_count          = 1
+  data_storage_size_in_tbs = 1
+  db_workload             = "OLTP"
+  is_auto_scaling_enabled  = true
+  is_free_tier             = false
+  license_model           = "LICENSE_INCLUDED"
 
-  compartment_id                = var.compartment_id
-  db_name                       = "MYADB01"
-  cpu_core_count                = 1
-  data_storage_size_in_tbs      = 1
-  db_workload                   = "OLTP"
-  admin_password_secret_id      = var.admin_password_secret_id
-  admin_password_secret_version = var.admin_password_secret_version
-}
+  # Si quieres desplegar un Private Endpoint, descomenta y proporciona los valores:
+  # subnet_id               = var.subnet_id
+  # nsg_ids                 = var.nsg_ids
+  # private_endpoint_label  = "my-private-adb"
 
-output "adb_ocid" {
-  value = module.autonomous_db.autonomous_database_id
-}
-
-output "adb_conn_strings" {
-  value = module.autonomous_db.connection_strings
+  # Tags de ejemplo
+  freeform_tags = {
+    "Environment" = "Development"
+    "CreatedBy"   = "Terraform"
+  }
+  defined_tags = {
+    "Oracle-Tags" = {
+      "CreatedBy" = "your_user_id" # Reemplaza con tu ID de usuario de OCI
+    }
+  }
 }
